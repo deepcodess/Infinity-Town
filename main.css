@@ -8,6 +8,12 @@ body {
   overscroll-behavior: none;
 }
 
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 #about-button {
   position: absolute;
   top: 1em;
