@@ -1,48 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinity Town – Evening City Simulation</title>
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Infinity Town</title>
-        <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@500&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="main.css">
-    </head>
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="main.css">
+</head>
 
-    <body>
-        <button id='about-button'></button>
-        <div id="about" class="">
-            <div class="popup">
-                <div class="inner">
-                    <h1>Infinity Town: Evening Set</h1>
-                    <div class="description">
+<body class="dark">
 
-                        <p>This demo is an attempt to experiment WebGL with THREE.js library. Its intention is to create
-                            a procedural city that feels alive and is fun to watch.</p>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loader"></div>
+        <p>Loading Infinity Town...</p>
+    </div>
 
-                        <p>This is highly inspired from the orignal demo <a target="_blank" href='https://demos.littleworkshop.fr/infinitown'>INFINITOWN</a>
-                        and <a target="_blank" href='https://kkhanhluu.github.io/'>INFINITY TOWN</a></p>
+    <!-- About Button -->
+    <button id="about-button"></button>
 
-                        <p>Made with: Three.js <br>Models by VenCreations & <a href='https://www.behance.net/deepsahablender'>Deep Saha.</a></p>
+    <!-- About Popup -->
+    <div id="about" class="">
+        <div class="popup">
+            <div class="inner" style="max-height: 80vh; overflow-y: auto;">
+                <h1>Infinity Town – Evening Set</h1>
 
-                    </div>
-                    <div class="close" id="about-close"></div>
+                <div class="description">
+                    <p><strong>Infinity Town</strong> is a real-time <b>WebGL 3D city simulation</b> built using the 
+                    <b>Three.js</b> framework. The project recreates a <strong>procedurally generated city</strong> with 
+                    cinematic movement, simulation-based traffic, dynamic lighting and evening environment ambience.</p>
+
+                    <p>The project draws inspiration from the original experimental build 
+                    <a target="_blank" href="https://demos.littleworkshop.fr/infinitown">INFINITOWN</a> 
+                    and the later visual concept 
+                    <a target="_blank" href="https://kkhanhluu.github.io/">INFINITY TOWN</a>, adding custom asset 
+                    development, modern rendering pipeline and performance-focused scene optimisation.</p>
+
+                    <h2 style="margin-top: 18px;">✨ Key Highlights</h2>
+                    <ul>
+                        <li>Procedural city generation with animated environment</li>
+                        <li>HDR-based evening lighting & reflections for realistic mood</li>
+                        <li>Advanced camera system with cinematic orbit & panning</li>
+                        <li>Optimized rendering for smooth performance on WebGL</li>
+                        <li>Custom Blender-built assets interactively rendered in real time</li>
+                    </ul>
+
+                    <h2 style="margin-top: 18px;">🛠️ Technologies Used</h2>
+                    <p>Three.js • WebGL • GLSL Shaders • HDRI Lighting • JavaScript • Blender • PBR Texturing</p>
+
+                    <h2 style="margin-top: 18px;">👥 Project Members</h2>
+
+                    <p><b>Swarnali Chatterjee</b><br><a target="_blank" href="https://github.com/Swarrrrovski">github.com/Swarrrrovski</a></p>
+                    <p><b>Shreyashi Raj</b><br><a target="_blank" href="https://github.com/SHREYASHIRAJ">github.com/SHREYASHIRAJ</a></p>
+                    <p><b>Deep Saha</b><br><a target="_blank" href="https://github.com/deepcodess">github.com/deepcodess</a></p>
+                    <p><b>Preetam Kr Majumdar</b><br><a target="_blank" href="https://github.com/MajumdarPreetam">github.com/MajumdarPreetam</a></p>
+                    <p><b>Rahul Rajeev Deb</b><br><a target="_blank" href="https://github.com/rahull79">github.com/rahull79</a></p>
+
+                    <p style="margin-top: 18px; font-size: 14px; text-align: center;">
+                        Version: <b>2025 • Evening Simulation Build</b>
+                    </p>
                 </div>
+
+                <div class="close" id="about-close"></div>
             </div>
         </div>
-        <canvas style="width: 100vw; height: 100vh" id="c"></canvas>
-        <script type="text/javascript" src="js/three.js"></script>
-        <!-- <script type="text/javascript" src="js/MapControls.js"></script> -->
-        <!-- <script type="text/javascript" src="js/inflate.min.js"></script> -->
-        <script type="text/javascript" src="js/stats.min.js"></script>
-        <script type="text/javascript" src="js/GLTFLoader.js"></script>
-        <script type="text/javascript" src="js/OrbitControls.js"></script>
-        <script type="text/javascript" src="js/RGBELoader.js"></script>
-        <script type="text/javascript" src="js/main.js"></script>
-        <script>
+    </div>
 
-        </script>
-    </body>
+    <canvas style="width: 100vw; height: 100vh" id="c"></canvas>
 
+    <script type="text/javascript" src="js/three.js"></script>
+    <script type="text/javascript" src="js/stats.min.js"></script>
+    <script type="text/javascript" src="js/GLTFLoader.js"></script>
+    <script type="text/javascript" src="js/OrbitControls.js"></script>
+    <script type="text/javascript" src="js/RGBELoader.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+
+    <script>
+        /* Preloader */
+        window.onload = () => {
+            document.getElementById("preloader").style.opacity = 0;
+            setTimeout(() => document.getElementById("preloader").style.display = "none", 600);
+        };
+
+        /* About Popup Show */
+        const about = document.getElementById("about");
+        document.getElementById("about-button").onclick = () => {
+            about.classList.add("visible");
+        };
+
+        /* About Popup Close */
+        document.getElementById("about-close").onclick = () => closePopup();
+        function closePopup() {
+            about.classList.remove("visible");
+        }
+
+        /* ESC to Close */
+        document.addEventListener("keydown", e => {
+            if (e.key === "Escape") closePopup();
+        });
+
+        /* Theme Toggle */
+        const themeToggle = document.getElementById("theme-toggle");
+        if (themeToggle) {
+            themeToggle.onclick = () => {
+                document.body.classList.toggle("dark");
+            };
+        }
+    </script>
+
+</body>
 </html>

@@ -13,6 +13,7 @@ var camera,
   mouse = new THREE.Vector2(),
   raycaster = new THREE.Raycaster(),
   carList = [],
+  
   manager = new THREE.LoadingManager(),
   loader = new THREE.GLTFLoader(manager),
   isPlaying = true;
@@ -132,6 +133,104 @@ function main() {
   controls.screenSpacePanning = true;
 
   scene = new THREE.Scene();
+  // -------------------- WEATHER SYSTEM -------------------- //
+// ---- Fog Ground Plane ---- //
+const fogPlane = new THREE.Mesh(
+  new THREE.PlaneGeometry(2000, 2000),
+  new THREE.MeshLambertMaterial({
+    color: 0xaaaaaa,
+    transparent: true,
+    opacity: 0.06
+  })
+);
+
+fogPlane.rotation.x = -Math.PI / 2;
+fogPlane.position.y = 2;
+scene.add(fogPlane);
+
+// Create rain particle system
+let rainGeo = new THREE.BufferGeometry();
+let rainCount = 15000;
+let rainPositions = new Float32Array(rainCount * 3);
+
+for (let i = 0; i < rainCount; i++) {
+  rainPositions[i * 3 + 0] = (Math.random() - 0.5) * 2000;
+  rainPositions[i * 3 + 1] = Math.random() * 300 + 50; 
+  rainPositions[i * 3 + 2] = (Math.random() - 0.5) * 2000;
+}
+
+rainGeo.setAttribute("position", new THREE.BufferAttribute(rainPositions, 3));
+
+let rainMaterial = new THREE.PointsMaterial({
+  color: 0x99ccff,
+  size: 0.4,
+  transparent: true,
+  opacity: 0.7
+});
+
+let rain = new THREE.Points(rainGeo, rainMaterial);
+scene.add(rain);
+
+// ---- Puddles (simple reflective planes) ---- //
+function createPuddle(x, z, scale = 1) {
+  const geo = new THREE.CircleGeometry(10 * scale, 32);
+
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x3355ff,
+    metalness: 0.6,
+    roughness: 0.4,
+    opacity: 0.45,
+    transparent: true,
+    envMapIntensity: 2.5,
+    depthWrite: false,     // ⭐ prevent puddle being overwritten
+    polygonOffset: true,
+    polygonOffsetFactor: -1,
+    polygonOffsetUnits: -1,
+  });
+
+  const puddle = new THREE.Mesh(geo, mat);
+  puddle.rotation.x = -Math.PI / 2;
+
+  puddle.position.set(x, 0.31, z);  // ⭐ always above roads
+
+  scene.add(puddle);
+}
+
+
+// Place puddles around world
+createPuddle(0, 0, 1.3);
+createPuddle(50, -20, 0.8);
+createPuddle(-40, 40, 1);
+createPuddle(20, 70, 0.7);
+
+// ---- Optional: lightning flash ---- //
+let lightning = new THREE.PointLight(0x88aaff, 0, 500, 2);
+lightning.position.set(0, 200, 0);
+scene.add(lightning);
+
+let nextLightning = performance.now() + 2000 + Math.random() * 4000;
+
+function updateWeather(delta) {
+  // Rain falling
+  let positions = rain.geometry.attributes.position.array;
+  for (let i = 0; i < rainCount; i++) {
+    positions[i * 3 + 1] -= 1 + Math.random() * 1;
+
+    if (positions[i * 3 + 1] < 0) {
+      positions[i * 3 + 1] = 200 + Math.random() * 100;
+    }
+  }
+  rain.geometry.attributes.position.needsUpdate = true;
+
+  // Lightning flashes
+  let now = performance.now();
+  if (now > nextLightning) {
+    lightning.intensity = 10;
+    setTimeout(() => (lightning.intensity = 0), 80);
+    nextLightning = now + 2000 + Math.random() * 4000;
+  }
+}
+
   scene.background = new THREE.Color('#14182b');
   //9fe3faff
   renderer.shadowMap.enabled = true;
@@ -319,6 +418,30 @@ function main() {
 
 
   cluster.forEach((cl) => loadClusters(cl));
+   // --- AUTO-GENERATE PUDDLES ONLY ON ROADS --- //
+function spawnRoadPuddles() {
+  cluster.forEach(tile => {
+    if (tile.cluster === 'road') {
+      // world position for tile
+      const worldX = tile.x * 60;
+      const worldZ = tile.z * 60;
+
+      // multiple puddles per road tile with randomness
+      const count = 2 + Math.floor(Math.random() * 3);
+
+      for (let i = 0; i < count; i++) {
+        const offsetX = (Math.random() - 0.5) * 40;
+        const offsetZ = (Math.random() - 0.5) * 40;
+        const scale = 0.5 + Math.random() * 1.2;
+
+        createPuddle(worldX + offsetX, worldZ + offsetZ, scale);
+      }
+    }
+  });
+}
+
+// call after clusters load
+spawnRoadPuddles();
 
   loadCars({ x: 1, z: 0, cluster: 'cars' });
 
@@ -355,6 +478,7 @@ function main() {
 
 
 
+         updateWeather();
 
 
 
