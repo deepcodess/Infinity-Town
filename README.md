@@ -95,7 +95,11 @@ The environment blends handcrafted 3D assets with advanced lighting, weather and
 
 
 ## Demo Video
-[![Infinity Town Demo](assets/Infinity_Town_video.gif)](assets/Infinity_Town_video.gif)
+
+<p align="center">
+  <img src="assets/Infinity_Town_video.gif" width="700">
+</p>
+
 
 
 
@@ -136,7 +140,18 @@ The environment blends handcrafted 3D assets with advanced lighting, weather and
 <br>
 
 ## License
-This project is licensed under <Your License Name>.
+
+<p align="center">
+  <a href="https://opensource.org/licenses/MIT">
+    <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License">
+  </a>
+</p>
+
+<p>
+  This project is released under the <strong>MIT License</strong>, allowing full permission to use, copy, modify, merge, publish, distribute, sublicense, and/or sell the software and its documentation — provided that the original copyright notice and this permission notice are included in all copies or substantial portions of the software.<br><br>
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS ORIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THEAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHERLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+</p>
+
 
 
 
