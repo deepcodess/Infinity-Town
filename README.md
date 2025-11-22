@@ -6,7 +6,6 @@ A 3D Infinite Town Experience built using **Three.js**, featuring customizable B
 </p>
 
 
-<br>
 
 
 ## 🚀 Overview
@@ -94,7 +93,7 @@ The environment blends handcrafted 3D assets with advanced lighting, weather and
 <br>
 
 
-## Demo Video
+## 🎬Demo Video
 
 <p align="center">
   <img src="assets/Infinity_Town_video.gif" width="700">
@@ -106,7 +105,7 @@ The environment blends handcrafted 3D assets with advanced lighting, weather and
 <br>
 
 
-## Development Contributions
+## 🧠Development Contributions
 - Created and optimized Blender 3D asset models for real-time rendering.
 - Integrated assets into Three.js using GLTFLoader with accurate scaling and placement.
 - Implemented dynamic weather system with clouds, rainfall & thunderstorms.
@@ -139,26 +138,23 @@ The environment blends handcrafted 3D assets with advanced lighting, weather and
 
 <br>
 
-## License
-
+## 📜License
 <p align="center">
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License">
   </a>
 </p>
-
 <p>
-  This project is released under the <strong>MIT License</strong>, allowing full permission to use, copy, modify, merge, publish, distribute, sublicense, and/or sell the software and its documentation — provided that the original copyright notice and this permission notice are included in all copies or substantial portions of the software.<br><br>
+  This project is released under <strong>MIT License</strong>, allowing full permission to use, copy, modify, merge, publish, distribute, sublicense, and/or sell the software and its documentation — provided that the original copyright notice and this permission notice are included in all copies or substantial portions of the software.<br><br>
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS ORIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THEAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHERLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 </p>
 
 
 
 
-<br>
 
 
-## Credits
+## 👥Credits
 <a href="https://github.com/QwertyFusion">@DeepCodess</a>
 <a href="https://github.com/Swarrrrovski">@Swarrrrovski</a>
 <a href="https://github.com/MajumdarPreetam">@MajumdarPreetam</a>
