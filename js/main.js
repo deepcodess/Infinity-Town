@@ -113,6 +113,9 @@ const cluster = [
   { x: -5, z: -5, cluster: clusterNames[8], direction: SOUTH },
 ];
 
+let cloudList = [];
+let rainLines = null;
+
 function main() {
   const canvas = document.querySelector('#c');
   renderer = new THREE.WebGLRenderer({ canvas });
@@ -147,29 +150,6 @@ const fogPlane = new THREE.Mesh(
 fogPlane.rotation.x = -Math.PI / 2;
 fogPlane.position.y = 2;
 scene.add(fogPlane);
-
-// Create rain particle system
-let rainGeo = new THREE.BufferGeometry();
-let rainCount = 15000;
-let rainPositions = new Float32Array(rainCount * 3);
-
-for (let i = 0; i < rainCount; i++) {
-  rainPositions[i * 3 + 0] = (Math.random() - 0.5) * 2000;
-  rainPositions[i * 3 + 1] = Math.random() * 300 + 50; 
-  rainPositions[i * 3 + 2] = (Math.random() - 0.5) * 2000;
-}
-
-rainGeo.setAttribute("position", new THREE.BufferAttribute(rainPositions, 3));
-
-let rainMaterial = new THREE.PointsMaterial({
-  color: 0x99ccff,
-  size: 0.4,
-  transparent: true,
-  opacity: 0.7
-});
-
-let rain = new THREE.Points(rainGeo, rainMaterial);
-scene.add(rain);
 
 // ---- Puddles (simple reflective planes) ---- //
 function createPuddle(x, z, scale = 1) {
@@ -211,16 +191,30 @@ scene.add(lightning);
 let nextLightning = performance.now() + 2000 + Math.random() * 4000;
 
 function updateWeather(delta) {
-  // Rain falling
-  let positions = rain.geometry.attributes.position.array;
-  for (let i = 0; i < rainCount; i++) {
-    positions[i * 3 + 1] -= 1 + Math.random() * 1;
-
-    if (positions[i * 3 + 1] < 0) {
-      positions[i * 3 + 1] = 200 + Math.random() * 100;
+  // Rain falling for rain lines
+  if (rainLines) {
+    const positions = rainLines.geometry.attributes.position.array;
+    for (let i = 0; i < positions.length; i += 6) {
+      positions[i + 1] -= 0.8 + Math.random() * 0.4; 
+      positions[i + 4] -= 0.8 + Math.random() * 0.4;
+      
+      if (positions[i + 1] < -10) {
+        const cloudHeight = 60 + Math.random() * 25; 
+        const length = 2; 
+        positions[i + 1] = cloudHeight;
+        positions[i + 4] = cloudHeight - length; 
+        
+        const x = Math.random() * 800 - 400;
+        const z = Math.random() * 800 - 400;
+        
+        positions[i] = x;    
+        positions[i + 2] = z; 
+        positions[i + 3] = x; 
+        positions[i + 5] = z; 
+      }
     }
+    rainLines.geometry.attributes.position.needsUpdate = true;
   }
-  rain.geometry.attributes.position.needsUpdate = true;
 
   // Lightning flashes
   let now = performance.now();
@@ -244,20 +238,6 @@ function updateWeather(delta) {
 
   {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-    //const light = new THREE.DirectionalLight(16774618, 1);
-    //light.position.set(300, 200, 300);
-    //light.castShadow = true;
-    //light.shadow.mapSize.width = light.shadow.mapSize.height = 4096;
-    //light.shadow.camera.near = 1;
-    //light.shadow.camera.far = 1000;
-    //light.shadow.camera.left = light.shadow.camera.bottom = -200;
-    //light.shadow.camera.right = light.shadow.camera.top = 200;
-    //light.shadow.mapSize.width = 2048;
-    //light.shadow.mapSize.height = 2048;
-    //scene.add(light);
-    //scene.add(light.target);
-    //scene.add(new THREE.HemisphereLight(0x222244, 0x000011, 0.5));
 
     // ---- NIGHTTIME lighting block (replace your existing block) ----
     const light = new THREE.DirectionalLight(0x8c5520, 1);
@@ -304,119 +284,6 @@ function updateWeather(delta) {
   const gltfLoader = new THREE.GLTFLoader();
 
 
-
-
-
-
-
-
-
-
-//
-//
-//
-//
-//// --- TRAFFIC LIGHT SYSTEM START ---
-//var trafficLights = [];
-//
-///**
-// * Add simple traffic lights at given grid positions (x,z are cluster/grid coords).
-// * Visual: small sphere above the ground. Each light object: {mesh, state, position, timer}
-// */
-//function addTrafficLight(x, z, initialState = 'red') {
-//  const pos = new THREE.Vector3(x * 60, 0, z * 60);
-//  const geo = new THREE.SphereGeometry(1.2, 8, 8);
-//  const mat = new THREE.MeshStandardMaterial({
-//    color: initialState === 'red' ? 0xff0000 : 0x00ff00,
-//    emissive: 0x000000
-//  });
-//  const mesh = new THREE.Mesh(geo, mat);
-//  mesh.position.set(pos.x, 3.5, pos.z);
-//  scene.add(mesh);
-//
-//  const tl = { mesh: mesh, state: initialState, position: pos, timer: 0 };
-//  trafficLights.push(tl);
-//  return tl;
-//}
-//
-//// Shared traffic cycle timing (ms)
-//var trafficCycleTime = 5000;
-//var lastTrafficToggle = performance.now();
-//
-//function updateTrafficLights(now) {
-//  if (now - lastTrafficToggle > trafficCycleTime) {
-//    console.log("🔁 toggling traffic lights");
-//    trafficLights.forEach((tl) => {
-//      tl.state = tl.state === 'red' ? 'green' : 'red';
-//      tl.mesh.material.color.set(tl.state === 'red' ? 0xff0000 : 0x00ff00);
-//    });
-//    lastTrafficToggle = now;
-//  }
-//}
-//
-///**
-// * Apply traffic rules to cars:
-// * - If a car is within stopDistance of a red light and is approaching it, set car.speed = 0.
-// * - Otherwise restore car.speed toward car.maxSpeed.
-// */
-//function applyTrafficToCars() {
-//  const stopDistance = 8; // tweak if cars stop too early/late
-//  carList.forEach((car) => {
-//    let blockedByTraffic = false;
-//    for (let tl of trafficLights) {
-//      const d = car.position.distanceTo(tl.position);
-//      if (d < stopDistance && tl.state === 'red') {
-//        // ensure car is approaching the light (dot product check)
-//        const dir = new THREE.Vector3(car.userData.x, 0, car.userData.z).normalize();
-//        const toLight = new THREE.Vector3().subVectors(tl.position, car.position).normalize();
-//        if (dir.dot(toLight) > 0.4) {
-//          car.speed = 0;
-//          blockedByTraffic = true;
-//          break;
-//        }
-//      }
-//    }
-//    if (!blockedByTraffic) {
-//      // if not blocked by traffic, restore speed (won't override collision stops because they also set speed=0)
-//      if (car.speed === 0) {
-//        car.speed = car.maxSpeed;
-//      }
-//    }
-//  });
-//}
-//
-///**
-// * Create initial lights — change coords to place lights at intersections you want.
-// * Coordinates are grid cluster coords (same grid units used in your loadClusters/loadCars).
-// */
-//function initTrafficLights() {
-//  // example: two lights near where loadCars({x:1,z:0}) is called
-//  addTrafficLight(1, 0, 'red');
-//  addTrafficLight(1, -1, 'green');
-//  console.log("✅ initTrafficLights called — trafficLights:", trafficLights.length);
-//}
-//// --- TRAFFIC LIGHT SYSTEM END ---
-//
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   cluster.forEach((cl) => loadClusters(cl));
    // --- AUTO-GENERATE PUDDLES ONLY ON ROADS --- //
 function spawnRoadPuddles() {
@@ -444,6 +311,8 @@ function spawnRoadPuddles() {
 spawnRoadPuddles();
 
   loadCars({ x: 1, z: 0, cluster: 'cars' });
+
+  raindrops();
 
 
 
@@ -475,39 +344,13 @@ spawnRoadPuddles();
     }
     controls.update();
 
+    // Update clouds movement
+    cloudList.forEach(c => {
+      c.position.x += 0.03;
+      if (c.position.x > 350) c.position.x = -350;
+    });
 
-
-
-         updateWeather();
-
-
-
-
-
-
-
-
-
-
-
-
-    //// update traffic light timers
-    //updateTrafficLights(performance.now());
-    //// apply traffic rules to carList
-    //applyTrafficToCars();
-
-
-
-
-
-
-
-
-
-
-
-
-
+    updateWeather();
 
     if (camera.position.x > 130) {
       controls.target.x -= LEAP;
@@ -680,4 +523,131 @@ function loadCars({ x, z, cluster, direction }) {
       carList.push(e);
     });
   });
+}
+
+function raindrops() {
+  let loader = new THREE.TextureLoader();
+
+  
+  createRainLines();
+
+  loader.load("../assets/smoke.png", function(texture) {
+    const cloudGeo = new THREE.PlaneGeometry(500, 500);
+    const cloudMaterial = new THREE.MeshLambertMaterial({
+      map: texture,
+      transparent: true,
+      opacity: 0.5,
+      depthWrite: false
+    });
+
+    for (let p = 0; p < 25; p++) {
+      
+      const cloudCluster = new THREE.Group();
+      
+     
+      const baseCloud = new THREE.Mesh(cloudGeo, cloudMaterial);
+      baseCloud.scale.set(1, 1, 1);
+      baseCloud.rotation.x = -Math.PI / 2;
+      baseCloud.rotation.z = Math.random() * Math.PI * 2;
+      cloudCluster.add(baseCloud);
+      
+      
+      const middleCloud = new THREE.Mesh(cloudGeo, cloudMaterial);
+      middleCloud.scale.set(0.7, 0.7, 0.7);
+      middleCloud.position.y = 5;
+      middleCloud.position.x = Math.random() * 50 - 25;
+      middleCloud.position.z = Math.random() * 50 - 25;
+      middleCloud.rotation.x = -Math.PI / 2;
+      middleCloud.rotation.z = Math.random() * Math.PI * 2;
+      cloudCluster.add(middleCloud);
+      
+      
+      const topCloud = new THREE.Mesh(cloudGeo, cloudMaterial);
+      topCloud.scale.set(0.5, 0.5, 0.5);
+      topCloud.position.y = 10;
+      topCloud.position.x = Math.random() * 30 - 15;
+      topCloud.position.z = Math.random() * 30 - 15;
+      topCloud.rotation.x = -Math.PI / 2;
+      topCloud.rotation.z = Math.random() * Math.PI * 2;
+      cloudCluster.add(topCloud);
+      
+      
+      for (let i = 0; i < 3; i++) {
+        const smallCloud = new THREE.Mesh(cloudGeo, cloudMaterial);
+        smallCloud.scale.set(0.3 + Math.random() * 0.2, 0.3 + Math.random() * 0.2, 0.3 + Math.random() * 0.2);
+        smallCloud.position.y = Math.random() * 8;
+        smallCloud.position.x = Math.random() * 80 - 40;
+        smallCloud.position.z = Math.random() * 80 - 40;
+        smallCloud.rotation.x = -Math.PI / 2;
+        smallCloud.rotation.z = Math.random() * Math.PI * 2;
+        cloudCluster.add(smallCloud);
+      }
+
+     
+      cloudCluster.position.set(
+        Math.random() * 600 - 300,
+        60 + Math.random() * 25,
+        Math.random() * 600 - 300
+      );
+
+      scene.add(cloudCluster);
+      cloudList.push(cloudCluster);
+    }
+    console.log("3D Layered Clouds added to scene");
+  });
+}
+
+function createRainLines() {
+  const rainCount = 1000; 
+  
+  const rainGeometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(rainCount * 6); 
+  const colors = new Float32Array(rainCount * 6); 
+  
+  for (let i = 0; i < rainCount; i++) {
+    const i6 = i * 6;
+    const cloudHeight = 60 + Math.random() * 25; 
+    const length = 2; 
+    const x = Math.random() * 800 - 400;
+    const z = Math.random() * 800 - 400;
+    
+    positions[i6] = x;         
+    positions[i6 + 1] = cloudHeight; 
+    positions[i6 + 2] = z;       
+ 
+    positions[i6 + 3] = x;         
+    positions[i6 + 4] = cloudHeight - length; 
+    positions[i6 + 5] = z;           
+    
+   
+    // Darker rain color - changed from light blue/grey to darker grey/blue
+    const r = 0.2 + Math.random() * 0.1;  // Darker red component
+    const g = 0.3 + Math.random() * 0.1;  // Darker green component  
+    const b = 0.4 + Math.random() * 0.1;  // Darker blue component
+   
+    colors[i6] = r;
+    colors[i6 + 1] = g;
+    colors[i6 + 2] = b;
+    
+  
+    colors[i6 + 3] = r;
+    colors[i6 + 4] = g;
+    colors[i6 + 5] = b;
+  }
+  
+  rainGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  rainGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  
+  const rainMaterial = new THREE.LineBasicMaterial({
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.8,
+    linewidth: 1 
+  });
+  
+ 
+  rainLines = new THREE.LineSegments(rainGeometry, rainMaterial);
+  scene.add(rainLines);
+  
+  console.log(`Created ${rainCount} dark grey raindrops (2 units long) starting from cloud layer`);
 }
